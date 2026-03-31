@@ -3,7 +3,7 @@ import os
 from markdown_blocks import markdown_to_html_node
 
 
-def generate_page(from_path, template_path, dest_path, basepath):
+def generate_page(from_path, template_path, dest_path, dest_root):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     with open(from_path, "r") as f:
         content = f.read()
@@ -12,10 +12,16 @@ def generate_page(from_path, template_path, dest_path, basepath):
     title = extract_title(content)
     html = markdown_to_html_node(content).to_html()
 
+    rel_to_root = os.path.relpath(dest_root, os.path.dirname(dest_path))
+    if rel_to_root == ".":
+        basepath = ""
+    else:
+        basepath = rel_to_root + "/"
+
     template = template.replace("{{ Title }}", title)
     template = template.replace("{{ Content }}", html)
-    template = template.replace('href="', f'href="{basepath}')
-    template = template.replace('src="', f'src="{basepath}')
+    template = template.replace('href="/', f'href="{basepath}')
+    template = template.replace('src="/', f'src="{basepath}')
 
     dest_dir_path = os.path.dirname(dest_path)
     if dest_dir_path != "":
