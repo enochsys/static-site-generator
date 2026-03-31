@@ -29,3 +29,15 @@ def extract_title(markdown):
         if line.startswith("# "):
             return line[2:].strip()
     raise ValueError("No title found in markdown")
+
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for root, dirs, files in os.walk(dir_path_content):
+        for file in files:
+            if file.endswith(".md"):
+                from_path = os.path.join(root, file)
+                dest_path = os.path.join(
+                    dest_dir_path, os.path.relpath(from_path, dir_path_content)
+                )
+                dest_path = dest_path.replace(".md", ".html")
+                generate_page(from_path, template_path, dest_path)
